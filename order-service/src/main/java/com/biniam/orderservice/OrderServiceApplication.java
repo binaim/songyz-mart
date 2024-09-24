@@ -1,13 +1,13 @@
-package com.biniam.songyzmart;
+package com.biniam.orderservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SongyzMartApplication {
+public class OrderServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SongyzMartApplication.class, args);
+        SpringApplication.run(OrderServiceApplication.class, args);
     }
 
 }

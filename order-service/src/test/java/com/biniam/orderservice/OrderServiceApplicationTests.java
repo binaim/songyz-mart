@@ -1,10 +1,10 @@
-package com.biniam.songyzmart;
+package com.biniam.orderservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SongyzMartApplicationTests {
+class OrderServiceApplicationTests {
 
     @Test
     void contextLoads() {

@@ -1,13 +1,13 @@
-package com.biniam.songyzmart;
+package com.biniam.inventoryservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SongyzMartApplication {
+public class InventoryServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SongyzMartApplication.class, args);
+        SpringApplication.run(InventoryServiceApplication.class, args);
     }
 
 }
