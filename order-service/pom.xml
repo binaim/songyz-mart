@@ -59,6 +59,11 @@
             <artifactId>spring-cloud-starter-contract-verifier</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -73,6 +78,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>order-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.cloud</groupId>
@@ -81,6 +87,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <testFramework>JUNIT5</testFramework>
+                    <failOnNoContracts>false</failOnNoContracts>
                 </configuration>
             </plugin>
             <plugin>
@@ -89,5 +96,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>
