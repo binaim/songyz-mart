@@ -15,7 +15,7 @@ public class ProductService {
     public Product findProductByName(String name){
         Product product = null;
         try {
-             product = productRepository.findProductByNameAndAvailabilityExists(name);
+             product = productRepository.findProductByName(name);
         }catch (Exception e){
 
         }

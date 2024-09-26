@@ -1,0 +1,13 @@
+db.getUsers()
+use admin
+cd -
+db.getUsers()
+mongosh --username biniam --password Biniam@123 --authenticationDatabase admin
+db.getUsers()
+show dbs
+use admin
+show dbs-password Biniam@123 --authenticationDatabase admin
+db.getUsers()
+show dbs
+use admin
+show dbs

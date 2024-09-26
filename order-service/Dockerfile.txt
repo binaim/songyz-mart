@@ -1,0 +1,10 @@
+# Dockerfile for order-service
+FROM openjdk:17-jdk-alpine
+
+WORKDIR /app
+
+COPY target/order-service.jar /app/order-service.jar
+
+EXPOSE 8082
+
+ENTRYPOINT ["java", "-jar", "/app/order-service.jar"]
