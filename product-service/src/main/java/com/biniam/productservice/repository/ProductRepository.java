@@ -9,6 +9,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     Product findProductByAvailability(boolean availability);
     Product findProductById(String id);
-    Product findProductByNameAndAvailabilityExists(String name);
+    Product findProductByName(String name);
 
 }

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+#  product-service:
+#    build:
+#      context: ./product-service
+#      dockerfile: Dockerfile.txt
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      SPRING_APPLICATION_NAME: product-service
+#      SPRING_DATA_MONGODB_HOST: mongodb
+#      SPRING_DATA_MONGODB_PORT: 27017
+#      SPRING_DATA_MONGODB_DATABASE: product-service-db
+#      SPRING_DATA_MONGODB_USERNAME: biniam
+#      SPRING_DATA_MONGODB_PASSWORD: Biniam@123
+
+#  order-service:
+#    build:
+#      context: ./order-service
+#    ports:
+#      - "8082:8082"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      MONGO_URI: mongodb://mongodb:27017/service_b_db
+#
+#  inventory-service:
+#    build:
+#      context: ./inventory-service
+#    ports:
+#      - "8083:8083"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      MONGO_URI: mongodb://mongodb:27017/service_c_db
+#
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker-volumes/mongodb-data:/data/db
+    environment:
+#      MONGO_INITDB_ROOT_USERNAME: biniam
+#      MONGO_INITDB_ROOT_PASSWORD: Biniam123
+      MONGO_INITDB_DATABASE: product-service-db
+
+
+  postgres-inventory:
+    image: postgres:latest
+    container_name: postgres-inventory-container
+    ports:
+      - "5432:5432"  # Map the default PostgreSQL port for external access
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: biniam
+      POSTGRES_PASSWORD: Biniam123
+    volumes:
+      - ./docker-volumes/postgres-inventory-data:/var/lib/postgresql/data
+
+  postgres-order:
+    image: postgres:latest
+    container_name: postgres-order-container
+    ports:
+      - "5433:5432"  # Use a different port for the order service PostgreSQL container
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: biniam
+      POSTGRES_PASSWORD: Biniam123
+    volumes:
+      - ./docker-volumes/postgres-order-data:/var/lib/postgresql/data

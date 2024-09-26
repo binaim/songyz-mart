@@ -18,5 +18,6 @@ public class ProductController {
     public Product getProductByNameIfExists(@PathVariable String name){
 
         return productService.findProductByName(name);
+//        return "I am alive";
     }
 }
