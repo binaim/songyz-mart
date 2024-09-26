@@ -50,6 +50,7 @@ services:
       MONGO_INITDB_DATABASE: product-service-db
 
 
+
   postgres-inventory:
     image: postgres:latest
     container_name: postgres-inventory-container
@@ -73,3 +74,46 @@ services:
       POSTGRES_PASSWORD: Biniam123
     volumes:
       - ./docker-volumes/postgres-order-data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1  # Zookeeper image from Confluent
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181  # Default port for Zookeeper client connections
+      ZOOKEEPER_TICK_TIME: 2000    # Basic Zookeeper config
+    ports:
+      - "2181:2181"  # Expose Zookeeper on port 2181 for other services and Kafka to connect
+#    volumes:
+#      - ./zookeeper-data:/var/lib/zookeeper/data  # Persist Zookeeper data
+#      - ./zookeeper-logs:/var/lib/zookeeper/logs  # Persist Zookeeper logs
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1  # Kafka image from Confluent
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Connect Kafka to Zookeeper
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092  # Kafka advertised address for clients
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Replication factor for offset topics (set to 1 for single-node setup)
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data  # Where Kafka stores its logs (topics, partitions, etc.)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'  # Automatically create topics when needed
+    ports:
+      - "9092:9092"  # Expose Kafka on port 9092 for client connections
+#    volumes:
+#      - ./kafka-data:/var/lib/kafka/data  # Persist Kafka logs
+    depends_on:
+      - zookeeper  # Ensure Zookeeper starts before Kafka
+
+  kafka-manager:
+    image: hlebalbau/kafka-manager:stable
+    container_name: kafka-manager
+    environment:
+      ZK_HOSTS: zookeeper:2181  # Zookeeper host address for Kafka Manager
+    ports:
+      - "9000:9000"  # Expose Kafka Manager on port 9000
+    depends_on:
+      - zookeeper
+      - kafka
