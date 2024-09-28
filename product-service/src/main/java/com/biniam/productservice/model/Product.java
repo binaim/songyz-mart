@@ -18,7 +18,7 @@ public class Product {
     private String id;
     private String name;
     private String description;
-    private Enum category;
+    private Category category;
     private double price;
     private Currency currency;
     private boolean availability;

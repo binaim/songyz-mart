@@ -1,9 +1,9 @@
 # Dockerfile for order-service
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk
 
 WORKDIR /app
 
-COPY target/order-service.jar /app/inventory-service.jar
+COPY target/inventory-service.jar /app/inventory-service.jar
 
 EXPOSE 8083
 

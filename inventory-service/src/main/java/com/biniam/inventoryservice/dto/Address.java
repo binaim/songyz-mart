@@ -15,5 +15,6 @@ public class Address {
     private String state;
     private int zipCode;
     private String aptNumber;
+    private String country;
 
 }

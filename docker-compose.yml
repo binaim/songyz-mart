@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+# PRODUCT-SERVICE-APP
 #  product-service:
 #    build:
 #      context: ./product-service
@@ -8,46 +9,81 @@ services:
 #    ports:
 #      - "8081:8081"
 #    depends_on:
-#      - mongodb
+#      - mongodb-product
 #    environment:
 #      SPRING_APPLICATION_NAME: product-service
-#      SPRING_DATA_MONGODB_HOST: mongodb
-#      SPRING_DATA_MONGODB_PORT: 27017
+#      SPRING_DATA_MONGODB_HOST: mongodb-product
+#      SPRING_DATA_MONGODB_PORT: 27018
 #      SPRING_DATA_MONGODB_DATABASE: product-service-db
-#      SPRING_DATA_MONGODB_USERNAME: biniam
-#      SPRING_DATA_MONGODB_PASSWORD: Biniam@123
-
+##      SPRING_DATA_MONGODB_USERNAME: biniam
+##      SPRING_DATA_MONGODB_PASSWORD: Biniam@123
+#
+## ORDER-SERVICE-APP
+#
 #  order-service:
 #    build:
 #      context: ./order-service
+#      dockerfile: Dockerfile.txt
+#
 #    ports:
 #      - "8082:8082"
 #    depends_on:
-#      - mongodb
+#      - mongodb-order
 #    environment:
-#      MONGO_URI: mongodb://mongodb:27017/service_b_db
+#      SPRING_APPLICATION_NAME: order-service
+#      SPRING_DATA_MONGODB_HOST: mongodb-order
+#      SPRING_DATA_MONGODB_PORT: 27019
+#      SPRING_DATA_MONGODB_DATABASE: order-service-db
+##      SPRING_DATA_MONGODB_USERNAME: biniam
+##      SPRING_DATA_MONGODB_PASSWORD: Biniam@123
+##      MONGO_URI: mongodb://mongodb:27017/service_b_db
 #
+## INVENTORY-SERVICE-APP
 #  inventory-service:
 #    build:
 #      context: ./inventory-service
+#      dockerfile: Dockerfile.txt
+#
 #    ports:
 #      - "8083:8083"
 #    depends_on:
-#      - mongodb
+#      - postgres-inventory
 #    environment:
-#      MONGO_URI: mongodb://mongodb:27017/service_c_db
+#      SPRING_APPLICATION_NAME: inventory-service
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-inventory:5432/inventory_db
+#      SPRING_DATASOURCE_USERNAME: biniam
+#      SPRING_DATASOURCE_PASSWORD: Biniam123
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#      SPRING_JPA_SHOW_SQL: true
+#      SPRING_PROFILES_ACTIVE: dev
+
+
+
+
 #
-  mongodb:
+  mongodb-product:
     image: mongo:latest
-    container_name: mongodb-container
+    container_name: mongodb-product-container
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
-      - ./docker-volumes/mongodb-data:/data/db
+      - ./docker-volumes/inventory-data:/data/db
     environment:
 #      MONGO_INITDB_ROOT_USERNAME: biniam
 #      MONGO_INITDB_ROOT_PASSWORD: Biniam123
       MONGO_INITDB_DATABASE: product-service-db
+
+  mongodb-order:
+    image: mongo:latest
+    container_name: mongodb-order-container
+    ports:
+      - "27019:27017"
+    volumes:
+      - ./docker-volumes/order-data:/data/db
+    environment:
+      #      MONGO_INITDB_ROOT_USERNAME: biniam
+      #      MONGO_INITDB_ROOT_PASSWORD: Biniam123
+      MONGO_INITDB_DATABASE: order-service-db
 
 
 
@@ -55,65 +91,69 @@ services:
     image: postgres:latest
     container_name: postgres-inventory-container
     ports:
-      - "5432:5432"  # Map the default PostgreSQL port for external access
+      - "5432:5432"
     environment:
       POSTGRES_DB: inventory_db
       POSTGRES_USER: biniam
       POSTGRES_PASSWORD: Biniam123
     volumes:
       - ./docker-volumes/postgres-inventory-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U biniam" ]
+      interval: 10s
+      retries: 5
 
-  postgres-order:
-    image: postgres:latest
-    container_name: postgres-order-container
-    ports:
-      - "5433:5432"  # Use a different port for the order service PostgreSQL container
-    environment:
-      POSTGRES_DB: order_db
-      POSTGRES_USER: biniam
-      POSTGRES_PASSWORD: Biniam123
-    volumes:
-      - ./docker-volumes/postgres-order-data:/var/lib/postgresql/data
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1  # Zookeeper image from Confluent
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181  # Default port for Zookeeper client connections
-      ZOOKEEPER_TICK_TIME: 2000    # Basic Zookeeper config
-    ports:
-      - "2181:2181"  # Expose Zookeeper on port 2181 for other services and Kafka to connect
+#  postgres-order:
+#    image: postgres:latest
+#    container_name: postgres-order-container
+#    ports:
+#      - "5433:5432"  # Use a different port for the order service PostgreSQL container
+#    environment:
+#      POSTGRES_DB: order_db
+#      POSTGRES_USER: biniam
+#      POSTGRES_PASSWORD: Biniam123
 #    volumes:
-#      - ./zookeeper-data:/var/lib/zookeeper/data  # Persist Zookeeper data
-#      - ./zookeeper-logs:/var/lib/zookeeper/logs  # Persist Zookeeper logs
+#      - ./docker-volumes/postgres-order-data:/var/lib/postgresql/data
 
-  kafka:
-    image: confluentinc/cp-kafka:7.0.1  # Kafka image from Confluent
-    container_name: kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Connect Kafka to Zookeeper
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092  # Kafka advertised address for clients
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Replication factor for offset topics (set to 1 for single-node setup)
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_LOG_DIRS: /var/lib/kafka/data  # Where Kafka stores its logs (topics, partitions, etc.)
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'  # Automatically create topics when needed
-    ports:
-      - "9092:9092"  # Expose Kafka on port 9092 for client connections
-#    volumes:
-#      - ./kafka-data:/var/lib/kafka/data  # Persist Kafka logs
-    depends_on:
-      - zookeeper  # Ensure Zookeeper starts before Kafka
-
-  kafka-manager:
-    image: hlebalbau/kafka-manager:stable
-    container_name: kafka-manager
-    environment:
-      ZK_HOSTS: zookeeper:2181  # Zookeeper host address for Kafka Manager
-    ports:
-      - "9000:9000"  # Expose Kafka Manager on port 9000
-    depends_on:
-      - zookeeper
-      - kafka
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.0.1  # Zookeeper image from Confluent
+#    container_name: zookeeper
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181  # Default port for Zookeeper client connections
+#      ZOOKEEPER_TICK_TIME: 2000    # Basic Zookeeper config
+#    ports:
+#      - "2181:2181"  # Expose Zookeeper on port 2181 for other services and Kafka to connect
+##    volumes:
+##      - ./zookeeper-data:/var/lib/zookeeper/data  # Persist Zookeeper data
+##      - ./zookeeper-logs:/var/lib/zookeeper/logs  # Persist Zookeeper logs
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:7.0.1  # Kafka image from Confluent
+#    container_name: kafka
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Connect Kafka to Zookeeper
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092  # Kafka advertised address for clients
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Replication factor for offset topics (set to 1 for single-node setup)
+#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_LOG_DIRS: /var/lib/kafka/data  # Where Kafka stores its logs (topics, partitions, etc.)
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'  # Automatically create topics when needed
+#    ports:
+#      - "9092:9092"  # Expose Kafka on port 9092 for client connections
+##    volumes:
+##      - ./kafka-data:/var/lib/kafka/data  # Persist Kafka logs
+#    depends_on:
+#      - zookeeper  # Ensure Zookeeper starts before Kafka
+#
+#  kafka-manager:
+#    image: hlebalbau/kafka-manager:stable
+#    container_name: kafka-manager
+#    environment:
+#      ZK_HOSTS: zookeeper:2181  # Zookeeper host address for Kafka Manager
+#    ports:
+#      - "9000:9000"  # Expose Kafka Manager on port 9000
+#    depends_on:
+#      - zookeeper
+#      - kafka
