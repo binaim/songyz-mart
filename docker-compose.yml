@@ -67,7 +67,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - ./docker-volumes/inventory-data:/data/db
+      - /Users/biniamghebremedhin/docker-volumes/product-data:/data/db
     environment:
 #      MONGO_INITDB_ROOT_USERNAME: biniam
 #      MONGO_INITDB_ROOT_PASSWORD: Biniam123
@@ -79,7 +79,7 @@ services:
     ports:
       - "27019:27017"
     volumes:
-      - ./docker-volumes/order-data:/data/db
+      - /Users/biniamghebremedhin/docker-volumes/order-data:/data/db
     environment:
       #      MONGO_INITDB_ROOT_USERNAME: biniam
       #      MONGO_INITDB_ROOT_PASSWORD: Biniam123
@@ -97,7 +97,7 @@ services:
       POSTGRES_USER: biniam
       POSTGRES_PASSWORD: Biniam123
     volumes:
-      - ./docker-volumes/postgres-inventory-data:/var/lib/postgresql/data
+      - /Users/biniamghebremedhin/docker-volumes/postgres-inventory-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U biniam" ]
       interval: 10s
