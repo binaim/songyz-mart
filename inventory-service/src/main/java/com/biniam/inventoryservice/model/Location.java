@@ -9,13 +9,18 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
+@Table(name = "locations")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long location_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Embedded
     private Address address;
+
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryItem> inventoryItems;
 }
