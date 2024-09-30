@@ -18,7 +18,7 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
     }
 
-    public InventoryItem getInventoryItem(String sku) {
+    public InventoryItem getInventoryItemBySKU(String sku) {
 
         Optional<InventoryItem> item = inventoryRepository.findBySku(sku);
 
