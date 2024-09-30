@@ -26,9 +26,9 @@ public class InventoryController {
 
 
     @GetMapping("/{sku}")
-    public InventoryItem getInventoryItem(String sku) {
-        return inventoryService.getInventoryItem(sku);
-    }
+    public InventoryItem getInventoryItemBySKU(@PathVariable String sku) {
+        return inventoryService.getInventoryItemBySKU(sku);
+
 
 
     @PostMapping()
