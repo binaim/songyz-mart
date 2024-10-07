@@ -1,33 +1,55 @@
 package com.biniam.orderservice.controller;
 
-import com.biniam.orderservice.model.Order;
-import com.biniam.orderservice.service.OrdreService;
+import com.biniam.orderservice.dto.OrderLineRequest;
+import com.biniam.orderservice.serviceImpl.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1.0/orders")
+@RequestMapping("/api/order")
 public class OrderController {
-
-    private final OrdreService orderService;
-
     @Autowired
-    public OrderController(OrdreService orderService) {
-        this.orderService = orderService;
+    private OrderService orderService;
+
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createOrder(@RequestBody OrderLineRequest orderLineRequest) {
+        orderService.persistOrder(orderLineRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders(){
+    @GetMapping("/get")
+    @ResponseStatus(HttpStatus.OK)
+    public String getOrder( @PathVariable long id) {
+        orderService.getOrder(id);
+        return "Order";
+    }
 
-        if (orderService.getAllOrders().isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(orderService.getAllOrders());
+    @DeleteMapping("/delete/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteOrder(@PathVariable long id) {
+        orderService.deleteOrder(id);
+    }
 
+    @PutMapping("/update/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateOrder(@PathVariable long id, @RequestBody OrderLineRequest orderLineRequest) {
+        orderService.updateOrder(id, orderLineRequest);
+    }
+
+//    @GetMapping("/getAllOrders")
+//    @ResponseStatus(HttpStatus.OK)
+//    public String getAllOrders(@PathVariable long id) {
+//        orderService.getAllOrders();
+//        return "All Orders";
+//    }
+       @GetMapping("/getAllOrders")
+    public ResponseEntity<List<OrderLineRequest>> getAllOrders() {
+        List<OrderLineRequest> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
 }
+
