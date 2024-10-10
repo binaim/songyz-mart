@@ -103,34 +103,40 @@ public class OrderService implements OrderServiceInterface {
                 orderLineRequest.getOrderLineItems().forEach(orderItemsDto -> {
                     orderItemsDto.setExpired(isExpired);
                 });
-                // Set expiration date and check if expired
-//                    orderItemsDto.setExpirationDate(expirationDate);
-//                    orderItemsDto.setExpired(isExpired);
-                // Set expiration date and expired flag in DTO
-                order.getOrderItemList().forEach(orderItems -> {
-                    OrderItemsDto orderItemsDto = new OrderItemsDto();
-                    orderItemsDto.setPrice(orderItems.getPrice());
-                    orderItemsDto.setOrderPaymentMethod(orderItems.getOrderPaymentMethod());
-                    orderItemsDto.setOrderPaymentStatus(orderItems.getOrderPaymentStatus());
-                    orderItemsDto.setOrderStatus(orderItems.getOrderStatus());
-                    orderItemsDto.setQuantity(orderItems.getQuantity());
-                    orderItemsDto.setOrederName(orderItems.getOrederName());
-                    // If the order has expired and payment was completed, process refund
+//                order.getOrderItemList().forEach(orderItems -> {
+//                    OrderItemsDto orderItemsDto = new OrderItemsDto();
+//                    orderItemsDto.setPrice(orderItems.getPrice());
+//                    orderItemsDto.setOrderPaymentMethod(orderItems.getOrderPaymentMethod());
+//                    orderItemsDto.setOrderPaymentStatus(orderItems.getOrderPaymentStatus());
+//                    orderItemsDto.setOrderStatus(orderItems.getOrderStatus());
+//                    orderItemsDto.setQuantity(orderItems.getQuantity());
+//                    orderItemsDto.setOrederName(orderItems.getOrederName());
 
-                    if (isExpired && PaymentStatus.COMPLETED.equals(PaymentStatus.valueOf(orderItemsDto.getOrderPaymentStatus()))) {
+                    List<OrderItemsDto> orderItemsDtos = order.getOrderItemList().stream()
+                            .map(orderItems -> OrderItemsDto.builder()
+                                    .price(orderItems.getPrice())
+                                    .orderPaymentMethod(orderItems.getOrderPaymentMethod())
+                                    .orderPaymentStatus(orderItems.getOrderPaymentStatus())
+                                    .orderStatus(orderItems.getOrderStatus())
+                                    .quantity(orderItems.getQuantity())
+                                    .orederName(orderItems.getOrederName())
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    // If the order has expired and payment was completed, process refund
+                    if (isExpired && PaymentStatus.COMPLETED.equals(PaymentStatus.valueOf(orderItemsDtos.get(getAllOrders().size()).getOrderPaymentStatus()))) {
                         // Process refund (this is just a placeholder for your actual refund logic)
-                        orderItemsDto.setOrderPaymentStatus(String.valueOf(PaymentStatus.CANCELED));
+                        orderItemsDtos.get(getAllOrders().size()).setOrderPaymentStatus(String.valueOf(PaymentStatus.CANCELED));
                         //  add refund logic here if you have one
                         // e.g. paymentService.processRefund(orderItems);
                     }
-                    orderLineRequest.setOrderLineItems(Collections.singletonList(orderItemsDto));
+                    orderLineRequest.setOrderLineItems(Collections.singletonList(orderItemsDtos.get(getAllOrders().size())));
                     // Generate PDF with order description
-                    List<OrderLineRequest> orderLineRequests = null;
-                    generateOrderPdf(orderLineRequests);
+                    //List<OrderLineRequest> orderLineRequests = null;
+                    generateOrderPdf((List<OrderLineRequest>) orderItemsDtos.get(getAllOrders().size()));
 
                     // Generate PDF after processing the orders
                     // pdfService.generateOrderPdf(orderItemsDto);
-                });
                 return orderLineRequest;
             }).collect(Collectors.toList());
         }
